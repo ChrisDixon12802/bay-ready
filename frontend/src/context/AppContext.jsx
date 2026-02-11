@@ -317,6 +317,15 @@ export function AppProvider({ children }) {
 
   const resetTimeSaved = () => {
     setTimeSavedToday(0);
+    // Clear all analytics data from localStorage
+    localStorage.removeItem("bayReadyData");
+    const allKeys = Object.keys(localStorage);
+    const keysToRemove = allKeys.filter(
+      (key) => key.startsWith("bayReadyData_") || key === "bayReadyAnalytics",
+    );
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   const value = {
