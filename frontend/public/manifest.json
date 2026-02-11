@@ -8,18 +8,6 @@
   "orientation": "portrait-primary",
   "theme_color": "#6366f1",
   "background_color": "#ffffff",
-  "screenshots": [
-    {
-      "src": "/icons/screenshot-1.png",
-      "type": "image/png",
-      "sizes": "540x720"
-    },
-    {
-      "src": "/icons/screenshot-2.png",
-      "type": "image/png",
-      "sizes": "540x720"
-    }
-  ],
   "icons": [
     {
       "src": "/icons/icon-192x192.svg",

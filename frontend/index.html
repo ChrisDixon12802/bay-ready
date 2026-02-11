@@ -18,7 +18,7 @@
       content="black-translucent"
     />
     <meta name="apple-mobile-web-app-title" content="Bay Ready" />
-    <link rel="apple-touch-icon" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-180x180.svg" />
     <link rel="manifest" href="/manifest.json" />
     <title>Bay Ready - Shop Floor Task Management</title>
   </head>
@@ -27,17 +27,46 @@
     <script type="module" src="/src/main.jsx"></script>
     <script>
       // Service Worker for PWA installation on iPad and mobile devices
+      console.log("[PWA Debug] Starting service worker registration check...");
+
       if ("serviceWorker" in navigator) {
+        console.log("[PWA Debug] Service Worker API available");
+
         window.addEventListener("load", () => {
+          console.log("[PWA Debug] Window load event fired");
+
+          // Check manifest
+          fetch("/manifest.json")
+            .then((r) => {
+              console.log("[PWA Debug] Manifest fetch status:", r.status);
+              return r.json();
+            })
+            .then((manifest) => {
+              console.log("[PWA Debug] Manifest valid:", manifest);
+            })
+            .catch((err) =>
+              console.log("[PWA Debug] Manifest fetch failed:", err),
+            );
+
           navigator.serviceWorker
             .register("/sw.js")
             .then((registration) => {
-              console.log("Service Worker registered:", registration);
+              console.log(
+                "[PWA Debug] ✅ Service Worker registered SUCCESSFULLY:",
+                registration,
+              );
+              console.log("[PWA Debug] Scope:", registration.scope);
             })
             .catch((error) => {
-              console.log("Service Worker registration failed:", error);
+              console.error(
+                "[PWA Debug] ❌ Service Worker registration FAILED:",
+                error.message,
+                error,
+              );
             });
         });
+      } else {
+        console.log("[PWA Debug] Service Worker API NOT available");
       }
 
       // Prompt to install app (PWA)
