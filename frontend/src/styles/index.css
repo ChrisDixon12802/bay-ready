@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button {
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  @apply bg-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-100 p-4;
+}
