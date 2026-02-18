@@ -295,11 +295,6 @@ export function AppProvider({ children }) {
       [category]: prev[category].map((item) => {
         if (item.id === itemId) {
           const newCompleted = !item.completed;
-          if (newCompleted) {
-            setTimeSavedToday((prevTime) => prevTime + 2);
-          } else {
-            setTimeSavedToday((prevTime) => Math.max(0, prevTime - 2));
-          }
           return { ...item, completed: newCompleted };
         }
         return item;

@@ -405,7 +405,7 @@ export default function Checklists() {
                     )}
                     {task.completed && (
                       <span className="text-xs text-success font-medium">
-                        +2 min saved
+                        Completed
                       </span>
                     )}
                   </div>
@@ -513,9 +513,9 @@ export default function Checklists() {
         </div>
         <div className="card text-center bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
           <p className="text-3xl font-bold text-purple-900">
-            {completedCount * 2}
+            {Math.round(progress)}%
           </p>
-          <p className="text-xs text-purple-700 font-medium">Min Saved</p>
+          <p className="text-xs text-purple-700 font-medium">Progress</p>
         </div>
       </div>
 
