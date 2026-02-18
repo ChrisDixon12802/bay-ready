@@ -106,7 +106,7 @@ function AppContent() {
         <div className="w-full px-1 sm:px-4 flex justify-around items-center h-16 sm:h-20 overflow-x-auto">
           {[
             { id: "dashboard", label: "Dashboard" },
-            { id: "checklists", label: "Clean" },
+            { id: "checklists", label: "Daily Flow" },
             { id: "tasks", label: "Tasks" },
             { id: "orders", label: "Orders" },
             { id: "analytics", label: "Analytics" },
