@@ -49,6 +49,13 @@ export default function Analytics() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      sessionStorage.removeItem(ANALYTICS_UNLOCKED_KEY);
+      setIsUnlocked(false);
+    };
+  }, []);
+
+  useEffect(() => {
     // Load all historical data from localStorage
     const allKeys = Object.keys(localStorage);
     const datePattern = /^bayReadyData_(\d{4}-\d{2}-\d{2})$/;
