@@ -91,10 +91,8 @@ export function AppProvider({ children }) {
         !!creatorEmail && userEmail === creatorEmail.toLowerCase().trim();
       const userRole = (currentUser?.role || "").toLowerCase().trim();
       const isManagerByRole = userRole.includes("manager");
-      const managerName = (currentUser?.managerName || "").trim();
-      const isManagerByProfile = managerName.length > 0;
 
-      return isCreator || isManagerByRole || isManagerByProfile;
+      return isCreator || isManagerByRole;
     } catch {
       return false;
     }
