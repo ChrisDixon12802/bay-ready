@@ -28,17 +28,23 @@ export default function Analytics() {
     let maxDay = null;
     let maxTime = 0;
 
-    // Get today's data
+    // Get today's data (only count if time has actually been saved)
     const saved = localStorage.getItem("bayReadyData");
     if (saved) {
       const data = JSON.parse(saved);
-      const today = new Date().toISOString().split("T")[0];
-      dailyDataArray.push({
-        date: today,
-        timeSaved: data.timeSavedToday || 0,
-        dayName: new Date().toLocaleDateString("en-US", { weekday: "long" }),
-      });
-      total += data.timeSavedToday || 0;
+      const todayTimeSaved = data.timeSavedToday || 0;
+
+      if (todayTimeSaved > 0) {
+        const today = new Date().toISOString().split("T")[0];
+        dailyDataArray.push({
+          date: today,
+          timeSaved: todayTimeSaved,
+          dayName: new Date().toLocaleDateString("en-US", {
+            weekday: "long",
+          }),
+        });
+        total += todayTimeSaved;
+      }
     }
 
     // Get historical data (if stored separately)
