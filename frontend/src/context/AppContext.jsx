@@ -149,6 +149,16 @@ export function AppProvider({ children }) {
       const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
 
       if (lastDate && lastDate !== today) {
+        const archivedDailyData = {
+          timeSavedToday: data.timeSavedToday || 0,
+          openingProgress: data.openingProgress || 0,
+          closingProgress: data.closingProgress || 0,
+        };
+        localStorage.setItem(
+          `bayReadyData_${lastDate}`,
+          JSON.stringify(archivedDailyData),
+        );
+
         // New day detected, reset time saved
         setTimeSavedToday(0);
       }
