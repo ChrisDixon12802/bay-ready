@@ -8,11 +8,15 @@ import {
   Clock,
   Trash2,
   Lock,
+  ListTodo,
+  Package,
+  Zap,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
 
 export default function Analytics() {
-  const { timeSavedToday, resetTimeSaved } = useAppContext();
+  const { timeSavedToday, resetTimeSaved, tasks, orders, checklists } =
+    useAppContext();
   const [dailyData, setDailyData] = useState([]);
   const [totalTimeSaved, setTotalTimeSaved] = useState(0);
   const [averageTimeSaved, setAverageTimeSaved] = useState(0);
@@ -523,6 +527,170 @@ export default function Analytics() {
             <p className="text-sm text-gray-500 text-center py-4">
               No data yet. Start tracking to see your best days!
             </p>
+          )}
+        </div>
+      </div>
+
+      {/* Not Done Items */}
+      <div className="card border-2 border-orange-200 shadow-lg bg-orange-50">
+        <h3 className="font-bold text-dark text-lg mb-4 flex items-center gap-2">
+          <AlertCircle className="text-orange-600" size={24} />
+          Not Done Items
+        </h3>
+        <div className="space-y-4">
+          {/* Incomplete Tasks */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <ListTodo className="text-blue-600" size={20} />
+              <h4 className="font-semibold text-dark text-sm">Tasks</h4>
+              <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                {tasks.filter((t) => !t.completed).length}
+              </span>
+            </div>
+            {tasks.filter((t) => !t.completed).length > 0 ? (
+              <div className="space-y-2 ml-6 bg-white p-3 rounded-lg">
+                {tasks
+                  .filter((t) => !t.completed)
+                  .map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex items-start gap-2 text-sm"
+                    >
+                      <span className="text-gray-400 flex-shrink-0 mt-0.5">
+                        •
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-dark font-medium">{task.title}</p>
+                        <p className="text-xs text-gray-500">
+                          {task.assignee
+                            ? `Assigned to ${task.assignee}`
+                            : "Unassigned"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-600 ml-6 italic">
+                All tasks completed!
+              </p>
+            )}
+          </div>
+
+          {/* Incomplete Orders */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Package className="text-green-600" size={20} />
+              <h4 className="font-semibold text-dark text-sm">Orders</h4>
+              <span className="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                {orders.filter((o) => !o.completed).length}
+              </span>
+            </div>
+            {orders.filter((o) => !o.completed).length > 0 ? (
+              <div className="space-y-2 ml-6 bg-white p-3 rounded-lg">
+                {orders
+                  .filter((o) => !o.completed)
+                  .map((order) => (
+                    <div
+                      key={order.id}
+                      className="flex items-start gap-2 text-sm"
+                    >
+                      <span className="text-gray-400 flex-shrink-0 mt-0.5">
+                        •
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-dark font-medium">{order.item}</p>
+                        <p className="text-xs text-gray-500">
+                          From {order.vendor}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-600 ml-6 italic">
+                All orders completed!
+              </p>
+            )}
+          </div>
+
+          {/* Incomplete Checklist Items */}
+          {(checklists.opening.filter((item) => !item.completed).length > 0 ||
+            checklists.mid.filter((item) => !item.completed).length > 0 ||
+            checklists.closing.filter((item) => !item.completed).length >
+              0) && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="text-yellow-600" size={20} />
+                <h4 className="font-semibold text-dark text-sm">
+                  Daily Checklist
+                </h4>
+                <span className="bg-yellow-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                  {checklists.opening.filter((item) => !item.completed).length +
+                    checklists.mid.filter((item) => !item.completed).length +
+                    checklists.closing.filter((item) => !item.completed).length}
+                </span>
+              </div>
+              <div className="space-y-2 ml-6 bg-white p-3 rounded-lg">
+                {checklists.opening.filter((item) => !item.completed).length >
+                  0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">
+                      Opening:
+                    </p>
+                    {checklists.opening
+                      .filter((item) => !item.completed)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-start gap-2 text-xs ml-2 mb-1"
+                        >
+                          <span className="text-gray-400">-</span>
+                          <p className="text-dark">{item.task}</p>
+                        </div>
+                      ))}
+                  </div>
+                )}
+                {checklists.mid.filter((item) => !item.completed).length >
+                  0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">
+                      Mid-Shift:
+                    </p>
+                    {checklists.mid
+                      .filter((item) => !item.completed)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-start gap-2 text-xs ml-2 mb-1"
+                        >
+                          <span className="text-gray-400">-</span>
+                          <p className="text-dark">{item.task}</p>
+                        </div>
+                      ))}
+                  </div>
+                )}
+                {checklists.closing.filter((item) => !item.completed).length >
+                  0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">
+                      Closing:
+                    </p>
+                    {checklists.closing
+                      .filter((item) => !item.completed)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-start gap-2 text-xs ml-2 mb-1"
+                        >
+                          <span className="text-gray-400">-</span>
+                          <p className="text-dark">{item.task}</p>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>
