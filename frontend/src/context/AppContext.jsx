@@ -286,6 +286,14 @@ export function AppProvider({ children }) {
     if (!canDeleteContent()) {
       return;
     }
+
+    const confirmed = window.confirm(
+      "Delete this task? This action cannot be undone.",
+    );
+    if (!confirmed) {
+      return;
+    }
+
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
   };
 
@@ -337,6 +345,14 @@ export function AppProvider({ children }) {
     if (!canDeleteContent()) {
       return;
     }
+
+    const confirmed = window.confirm(
+      "Delete this Daily Flow item? This action cannot be undone.",
+    );
+    if (!confirmed) {
+      return;
+    }
+
     setChecklists((prev) => ({
       ...prev,
       [category]: prev[category].filter((item) => item.id !== taskId),
@@ -377,6 +393,14 @@ export function AppProvider({ children }) {
     if (!canDeleteContent()) {
       return;
     }
+
+    const confirmed = window.confirm(
+      "Delete this order? This action cannot be undone.",
+    );
+    if (!confirmed) {
+      return;
+    }
+
     setOrders((prev) => prev.filter((order) => order.id !== orderId));
   };
 
