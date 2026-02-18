@@ -17,6 +17,7 @@ export default function Analytics() {
   const [averageTimeSaved, setAverageTimeSaved] = useState(0);
   const [daysTracked, setDaysTracked] = useState(0);
   const [bestDay, setBestDay] = useState(null);
+  const [selectedRange, setSelectedRange] = useState("30d");
 
   useEffect(() => {
     // Load all historical data from localStorage
@@ -92,6 +93,60 @@ export default function Analytics() {
     return [...dailyData].sort((a, b) => b.timeSaved - a.timeSaved).slice(0, 5);
   };
 
+  const getFilteredData = () => {
+    if (selectedRange === "all") {
+      return dailyData;
+    }
+
+    const daysBack = selectedRange === "7d" ? 7 : 30;
+    const cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - (daysBack - 1));
+
+    return dailyData.filter((day) => new Date(day.date) >= cutoff);
+  };
+
+  const filteredData = getFilteredData();
+  const filteredTotalTimeSaved = filteredData.reduce(
+    (total, day) => total + day.timeSaved,
+    0,
+  );
+  const filteredAverageTimeSaved =
+    filteredData.length > 0
+      ? Math.round(filteredTotalTimeSaved / filteredData.length)
+      : 0;
+  const filteredDaysTracked = filteredData.length;
+  const filteredBestDay =
+    filteredData.length > 0
+      ? [...filteredData].sort((a, b) => b.timeSaved - a.timeSaved)[0]
+      : null;
+  const filteredDaysWithoutProgress = filteredData.filter(
+    (day) => day.timeSaved === 0,
+  ).length;
+
+  const getCurrentStreak = () => {
+    if (dailyData.length === 0) {
+      return 0;
+    }
+
+    const sortedData = [...dailyData].sort(
+      (a, b) => new Date(b.date) - new Date(a.date),
+    );
+    let streak = 0;
+
+    for (const day of sortedData) {
+      if (day.timeSaved > 0) {
+        streak += 1;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  };
+
+  const currentStreak = getCurrentStreak();
+
   const handleResetAnalytics = () => {
     if (
       window.confirm(
@@ -149,6 +204,27 @@ export default function Analytics() {
         </button>
       </div>
 
+      {/* Range Filter */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { key: "7d", label: "Last 7 Days" },
+          { key: "30d", label: "Last 30 Days" },
+          { key: "all", label: "All Time" },
+        ].map((range) => (
+          <button
+            key={range.key}
+            onClick={() => setSelectedRange(range.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+              selectedRange === range.key
+                ? "bg-purple-600 text-white"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            {range.label}
+          </button>
+        ))}
+      </div>
+
       {/* Key Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Total Time Saved */}
@@ -159,7 +235,7 @@ export default function Analytics() {
                 Total Time Saved
               </p>
               <p className="text-4xl font-bold text-purple-600 mt-2">
-                {totalTimeSaved}
+                {filteredTotalTimeSaved}
               </p>
               <p className="text-xs text-gray-500 mt-1">minutes</p>
             </div>
@@ -175,7 +251,7 @@ export default function Analytics() {
             <div>
               <p className="text-sm text-gray-600 font-semibold">Avg Per Day</p>
               <p className="text-4xl font-bold text-blue-600 mt-2">
-                {averageTimeSaved}
+                {filteredAverageTimeSaved}
               </p>
               <p className="text-xs text-gray-500 mt-1">minutes</p>
             </div>
@@ -193,7 +269,7 @@ export default function Analytics() {
                 Days Tracked
               </p>
               <p className="text-4xl font-bold text-green-600 mt-2">
-                {daysTracked}
+                {filteredDaysTracked}
               </p>
               <p className="text-xs text-gray-500 mt-1">total days</p>
             </div>
@@ -209,7 +285,7 @@ export default function Analytics() {
             <div>
               <p className="text-sm text-gray-600 font-semibold">Days Behind</p>
               <p className="text-4xl font-bold text-red-600 mt-2">
-                {getDaysWithoutProgress()}
+                {filteredDaysWithoutProgress}
               </p>
               <p className="text-xs text-gray-500 mt-1">no progress saved</p>
             </div>
@@ -220,18 +296,29 @@ export default function Analytics() {
         </div>
       </div>
 
+      {/* Streak */}
+      <div className="card border-2 border-indigo-200 shadow-lg bg-indigo-50">
+        <h3 className="font-bold text-dark text-lg">Current Streak</h3>
+        <p className="text-3xl font-bold text-indigo-700 mt-2">
+          {currentStreak} {currentStreak === 1 ? "day" : "days"}
+        </p>
+        <p className="text-xs text-gray-600 mt-1">
+          Consecutive tracked days with time saved above 0 minutes.
+        </p>
+      </div>
+
       {/* Best Day */}
-      {bestDay && (
+      {filteredBestDay && (
         <div className="card border-l-4 border-yellow-500 shadow-lg bg-yellow-50">
           <div className="flex items-center gap-3 mb-3">
             <div className="text-3xl">🏆</div>
             <div>
               <h3 className="font-bold text-dark text-lg">Best Day</h3>
-              <p className="text-sm text-gray-600">{bestDay.date}</p>
+              <p className="text-sm text-gray-600">{filteredBestDay.date}</p>
             </div>
           </div>
           <p className="text-2xl font-bold text-yellow-700 mt-2">
-            {bestDay.timeSaved} minutes saved
+            {filteredBestDay.timeSaved} minutes saved
           </p>
         </div>
       )}
@@ -243,23 +330,31 @@ export default function Analytics() {
           Top 5 Days
         </h3>
         <div className="space-y-3">
-          {getTopDays().length > 0 ? (
-            getTopDays().map((day, index) => (
-              <div key={day.date} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
-                    #{index + 1}
+          {[...filteredData]
+            .sort((a, b) => b.timeSaved - a.timeSaved)
+            .slice(0, 5).length > 0 ? (
+            [...filteredData]
+              .sort((a, b) => b.timeSaved - a.timeSaved)
+              .slice(0, 5)
+              .map((day, index) => (
+                <div
+                  key={day.date}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                      #{index + 1}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-dark">{day.date}</p>
+                      <p className="text-xs text-gray-500">{day.dayName}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-dark">{day.date}</p>
-                    <p className="text-xs text-gray-500">{day.dayName}</p>
-                  </div>
+                  <p className="font-bold text-purple-600 text-lg">
+                    {day.timeSaved} min
+                  </p>
                 </div>
-                <p className="font-bold text-purple-600 text-lg">
-                  {day.timeSaved} min
-                </p>
-              </div>
-            ))
+              ))
           ) : (
             <p className="text-sm text-gray-500 text-center py-4">
               No data yet. Start tracking to see your best days!
@@ -272,8 +367,8 @@ export default function Analytics() {
       <div className="card border-2 border-gray-200 shadow-lg">
         <h3 className="font-bold text-dark text-lg mb-4">Daily Breakdown</h3>
         <div className="space-y-2 max-h-96 overflow-y-auto">
-          {dailyData.length > 0 ? (
-            dailyData.map((day) => (
+          {filteredData.length > 0 ? (
+            filteredData.map((day) => (
               <div
                 key={day.date}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
@@ -308,19 +403,19 @@ export default function Analytics() {
           💡 Insights
         </h3>
         <ul className="space-y-2 text-sm">
-          {totalTimeSaved > 0 && (
+          {filteredTotalTimeSaved > 0 && (
             <li className="flex items-start gap-2">
               <CheckCircle2
                 size={16}
                 className="text-success flex-shrink-0 mt-0.5"
               />
               <span>
-                You've saved <strong>{totalTimeSaved} minutes</strong> across{" "}
-                <strong>{daysTracked} days</strong> of productivity!
+                You've saved <strong>{filteredTotalTimeSaved} minutes</strong>{" "}
+                across <strong>{filteredDaysTracked} days</strong> in this view.
               </span>
             </li>
           )}
-          {averageTimeSaved > 0 && (
+          {filteredAverageTimeSaved > 0 && (
             <li className="flex items-start gap-2">
               <CheckCircle2
                 size={16}
@@ -328,23 +423,23 @@ export default function Analytics() {
               />
               <span>
                 Your average daily savings is{" "}
-                <strong>{averageTimeSaved} minutes</strong> per day.
+                <strong>{filteredAverageTimeSaved} minutes</strong> per day.
               </span>
             </li>
           )}
-          {getDaysWithoutProgress() > 0 && (
+          {filteredDaysWithoutProgress > 0 && (
             <li className="flex items-start gap-2">
               <AlertCircle
                 size={16}
                 className="text-warning flex-shrink-0 mt-0.5"
               />
               <span>
-                You have <strong>{getDaysWithoutProgress()} days</strong> where
-                no time was saved. Keep the momentum going!
+                You have <strong>{filteredDaysWithoutProgress} days</strong>{" "}
+                where no time was saved in this range. Keep the momentum going!
               </span>
             </li>
           )}
-          {getDaysWithoutProgress() === 0 && daysTracked > 0 && (
+          {filteredDaysWithoutProgress === 0 && filteredDaysTracked > 0 && (
             <li className="flex items-start gap-2">
               <CheckCircle2
                 size={16}
