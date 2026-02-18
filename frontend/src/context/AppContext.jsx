@@ -325,6 +325,10 @@ export function AppProvider({ children }) {
     setOrders((prev) => [...prev, order]);
   };
 
+  const deleteOrder = (orderId) => {
+    setOrders((prev) => prev.filter((order) => order.id !== orderId));
+  };
+
   const resetTimeSaved = () => {
     setTimeSavedToday(0);
     // Clear all analytics data from localStorage
@@ -355,6 +359,7 @@ export function AppProvider({ children }) {
     setOrders,
     toggleOrder,
     addOrder,
+    deleteOrder,
     timeSavedToday,
     setTimeSavedToday,
     resetTimeSaved,

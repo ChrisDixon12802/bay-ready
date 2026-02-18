@@ -529,7 +529,7 @@ export default function Orders() {
                             e.stopPropagation();
                             deleteOrder(order.id);
                           }}
-                          className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                          className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -606,7 +606,7 @@ export default function Orders() {
                       e.stopPropagation();
                       deleteOrder(order.id);
                     }}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                   >
                     <Trash2 size={20} />
                   </button>
@@ -661,7 +661,7 @@ export default function Orders() {
                       e.stopPropagation();
                       deleteOrder(order.id);
                     }}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                   >
                     <Trash2 size={18} />
                   </button>
