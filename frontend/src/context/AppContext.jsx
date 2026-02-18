@@ -64,9 +64,21 @@ export function AppProvider({ children }) {
     return 0;
   });
 
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(() => {
+    const saved = localStorage.getItem("bayReadyTeam");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [];
+  });
 
-  const [customRoles, setCustomRoles] = useState([]);
+  const [customRoles, setCustomRoles] = useState(() => {
+    const saved = localStorage.getItem("bayReadyRoles");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [];
+  });
 
   const addRole = (newRole) => {
     const roleExists = customRoles.some((r) => r.name === newRole.name);
@@ -90,12 +102,16 @@ export function AppProvider({ children }) {
   };
 
   const addEmployee = (employee) => {
-    const newEmployee = {
-      id: employees.length + 1,
-      name: employee.name,
-      role: employee.role || "Tech",
-    };
-    setEmployees((prev) => [...prev, newEmployee]);
+    setEmployees((prev) => {
+      const maxId = prev.length > 0 ? Math.max(...prev.map((e) => e.id), 0) : 0;
+      const newEmployee = {
+        id: maxId + 1,
+        name: employee.name,
+        role: employee.role || "Tech",
+        status: "Active",
+      };
+      return [...prev, newEmployee];
+    });
   };
 
   const deleteEmployee = (employeeId) => {
@@ -188,6 +204,14 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem("bayReadySettings", JSON.stringify(settings));
   }, [settings]);
+
+  useEffect(() => {
+    localStorage.setItem("bayReadyTeam", JSON.stringify(employees));
+  }, [employees]);
+
+  useEffect(() => {
+    localStorage.setItem("bayReadyRoles", JSON.stringify(customRoles));
+  }, [customRoles]);
 
   useEffect(() => {
     const openingTotal = checklists.opening.length;
