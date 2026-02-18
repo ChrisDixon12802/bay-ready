@@ -6,6 +6,11 @@ export default function ConfirmModal({
   message,
   confirmText = "Delete",
   cancelText = "Cancel",
+  requirePassword = false,
+  passwordValue = "",
+  onPasswordChange,
+  passwordPlaceholder = "Enter manager/creator password",
+  passwordError = "",
   onConfirm,
   onCancel,
 }) {
@@ -31,6 +36,24 @@ export default function ConfirmModal({
             <p className="text-sm text-gray-600 mt-1">{message}</p>
           </div>
         </div>
+
+        {requirePassword && (
+          <div className="mt-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Approval Password
+            </label>
+            <input
+              type="password"
+              value={passwordValue}
+              onChange={(e) => onPasswordChange?.(e.target.value)}
+              placeholder={passwordPlaceholder}
+              className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+            />
+            {passwordError ? (
+              <p className="text-xs text-danger mt-2">{passwordError}</p>
+            ) : null}
+          </div>
+        )}
 
         <div className="mt-5 flex gap-3">
           <button

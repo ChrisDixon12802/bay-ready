@@ -24,6 +24,8 @@ export default function Checklists() {
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskRequired, setNewTaskRequired] = useState(false);
   const [dailyFlowPendingDelete, setDailyFlowPendingDelete] = useState(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
   const {
     checklists,
     toggleChecklistTask,
@@ -31,6 +33,7 @@ export default function Checklists() {
     addChecklistTask,
     deleteChecklistTask,
     canDeleteContent,
+    verifyDeleteApproval,
   } = useAppContext();
 
   const canDelete = canDeleteContent();
@@ -516,12 +519,32 @@ export default function Checklists() {
         title="Delete Daily Flow Item"
         message={`Are you sure you want to delete "${dailyFlowPendingDelete?.name || "this item"}" from Daily Flow? This action cannot be undone.`}
         confirmText="Delete Item"
-        onCancel={() => setDailyFlowPendingDelete(null)}
+        requirePassword
+        passwordValue={deletePassword}
+        onPasswordChange={(value) => {
+          setDeletePassword(value);
+          if (deleteError) {
+            setDeleteError("");
+          }
+        }}
+        passwordError={deleteError}
+        onCancel={() => {
+          setDailyFlowPendingDelete(null);
+          setDeletePassword("");
+          setDeleteError("");
+        }}
         onConfirm={() => {
+          if (!verifyDeleteApproval(deletePassword)) {
+            setDeleteError("Manager/Creator password is incorrect.");
+            return;
+          }
+
           if (dailyFlowPendingDelete !== null) {
             deleteChecklistTask(activeChecklist, dailyFlowPendingDelete.id);
           }
           setDailyFlowPendingDelete(null);
+          setDeletePassword("");
+          setDeleteError("");
         }}
       />
     </div>

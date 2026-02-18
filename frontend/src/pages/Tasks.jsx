@@ -25,6 +25,7 @@ export default function Tasks() {
     toggleTask: contextToggleTask,
     deleteTask,
     canDeleteContent,
+    verifyDeleteApproval,
   } = useAppContext();
 
   const canDelete = canDeleteContent();
@@ -35,6 +36,8 @@ export default function Tasks() {
   const [filterAssignee, setFilterAssignee] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [taskPendingDelete, setTaskPendingDelete] = useState(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   const [newTask, setNewTask] = useState({
     title: "",
@@ -566,12 +569,32 @@ export default function Tasks() {
         title="Delete Task"
         message={`Are you sure you want to delete "${taskPendingDelete?.name || "this task"}"? This action cannot be undone.`}
         confirmText="Delete Task"
-        onCancel={() => setTaskPendingDelete(null)}
+        requirePassword
+        passwordValue={deletePassword}
+        onPasswordChange={(value) => {
+          setDeletePassword(value);
+          if (deleteError) {
+            setDeleteError("");
+          }
+        }}
+        passwordError={deleteError}
+        onCancel={() => {
+          setTaskPendingDelete(null);
+          setDeletePassword("");
+          setDeleteError("");
+        }}
         onConfirm={() => {
+          if (!verifyDeleteApproval(deletePassword)) {
+            setDeleteError("Manager/Creator password is incorrect.");
+            return;
+          }
+
           if (taskPendingDelete !== null) {
             deleteTask(taskPendingDelete.id);
           }
           setTaskPendingDelete(null);
+          setDeletePassword("");
+          setDeleteError("");
         }}
       />
     </div>

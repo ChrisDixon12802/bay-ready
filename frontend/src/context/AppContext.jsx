@@ -98,6 +98,22 @@ export function AppProvider({ children }) {
     }
   };
 
+  const verifyDeleteApproval = (password) => {
+    try {
+      if (!canDeleteContent()) {
+        return false;
+      }
+
+      const savedUser = localStorage.getItem("bayReadyUser");
+      const currentUser = savedUser ? JSON.parse(savedUser) : null;
+      const currentPassword = currentUser?.password || "";
+
+      return currentPassword.length > 0 && currentPassword === password;
+    } catch {
+      return false;
+    }
+  };
+
   const addRole = (newRole) => {
     const roleExists = customRoles.some((r) => r.name === newRole.name);
     if (!roleExists) {
@@ -407,6 +423,7 @@ export function AppProvider({ children }) {
     addOrder,
     deleteOrder,
     canDeleteContent,
+    verifyDeleteApproval,
     timeSavedToday,
     setTimeSavedToday,
     resetTimeSaved,

@@ -28,6 +28,7 @@ export default function Orders() {
     toggleOrder: contextToggleOrder,
     deleteOrder,
     canDeleteContent,
+    verifyDeleteApproval,
   } = useAppContext();
 
   const canDelete = canDeleteContent();
@@ -39,6 +40,8 @@ export default function Orders() {
   const [showFilters, setShowFilters] = useState(false);
   const [groupByVendor, setGroupByVendor] = useState(false);
   const [orderPendingDelete, setOrderPendingDelete] = useState(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   const [newOrder, setNewOrder] = useState({
     item: "",
@@ -697,12 +700,32 @@ export default function Orders() {
         title="Delete Order"
         message={`Are you sure you want to delete "${orderPendingDelete?.name || "this order"}"? This action cannot be undone.`}
         confirmText="Delete Order"
-        onCancel={() => setOrderPendingDelete(null)}
+        requirePassword
+        passwordValue={deletePassword}
+        onPasswordChange={(value) => {
+          setDeletePassword(value);
+          if (deleteError) {
+            setDeleteError("");
+          }
+        }}
+        passwordError={deleteError}
+        onCancel={() => {
+          setOrderPendingDelete(null);
+          setDeletePassword("");
+          setDeleteError("");
+        }}
         onConfirm={() => {
+          if (!verifyDeleteApproval(deletePassword)) {
+            setDeleteError("Manager/Creator password is incorrect.");
+            return;
+          }
+
           if (orderPendingDelete !== null) {
             deleteOrder(orderPendingDelete.id);
           }
           setOrderPendingDelete(null);
+          setDeletePassword("");
+          setDeleteError("");
         }}
       />
     </div>
