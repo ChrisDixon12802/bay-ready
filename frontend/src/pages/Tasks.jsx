@@ -23,7 +23,10 @@ export default function Tasks() {
     addTask: contextAddTask,
     toggleTask: contextToggleTask,
     deleteTask,
+    canDeleteContent,
   } = useAppContext();
+
+  const canDelete = canDeleteContent();
 
   const [showNewTask, setShowNewTask] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -466,15 +469,17 @@ export default function Tasks() {
                   </div>
 
                   {/* Delete Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteTask(task.id);
-                    }}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 size={20} />
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTask(task.id);
+                      }}
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))
@@ -536,15 +541,17 @@ export default function Tasks() {
                   </div>
 
                   {/* Delete Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteTask(task.id);
-                    }}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTask(task.id);
+                      }}
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

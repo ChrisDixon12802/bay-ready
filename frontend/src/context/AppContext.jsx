@@ -80,6 +80,26 @@ export function AppProvider({ children }) {
     return [];
   });
 
+  const canDeleteContent = () => {
+    try {
+      const savedUser = localStorage.getItem("bayReadyUser");
+      const currentUser = savedUser ? JSON.parse(savedUser) : null;
+      const creatorEmail = localStorage.getItem("bayReadyCreatorEmail");
+
+      const userEmail = (currentUser?.email || "").toLowerCase().trim();
+      const isCreator =
+        !!creatorEmail && userEmail === creatorEmail.toLowerCase().trim();
+      const userRole = (currentUser?.role || "").toLowerCase().trim();
+      const isManagerByRole = userRole.includes("manager");
+      const managerName = (currentUser?.managerName || "").trim();
+      const isManagerByProfile = managerName.length > 0;
+
+      return isCreator || isManagerByRole || isManagerByProfile;
+    } catch {
+      return false;
+    }
+  };
+
   const addRole = (newRole) => {
     const roleExists = customRoles.some((r) => r.name === newRole.name);
     if (!roleExists) {
@@ -265,6 +285,9 @@ export function AppProvider({ children }) {
   };
 
   const deleteTask = (taskId) => {
+    if (!canDeleteContent()) {
+      return;
+    }
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
   };
 
@@ -313,6 +336,9 @@ export function AppProvider({ children }) {
   };
 
   const deleteChecklistTask = (category, taskId) => {
+    if (!canDeleteContent()) {
+      return;
+    }
     setChecklists((prev) => ({
       ...prev,
       [category]: prev[category].filter((item) => item.id !== taskId),
@@ -350,6 +376,9 @@ export function AppProvider({ children }) {
   };
 
   const deleteOrder = (orderId) => {
+    if (!canDeleteContent()) {
+      return;
+    }
     setOrders((prev) => prev.filter((order) => order.id !== orderId));
   };
 
@@ -384,6 +413,7 @@ export function AppProvider({ children }) {
     toggleOrder,
     addOrder,
     deleteOrder,
+    canDeleteContent,
     timeSavedToday,
     setTimeSavedToday,
     resetTimeSaved,

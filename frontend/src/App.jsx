@@ -22,12 +22,26 @@ function AppContent() {
   useEffect(() => {
     const savedLogin = localStorage.getItem("bayReadyUser");
     if (savedLogin) {
+      try {
+        const parsedUser = JSON.parse(savedLogin);
+        const creatorEmail = localStorage.getItem("bayReadyCreatorEmail");
+        if (!creatorEmail && parsedUser?.email) {
+          localStorage.setItem("bayReadyCreatorEmail", parsedUser.email);
+        }
+      } catch {
+        // Ignore malformed cached login payload
+      }
       setIsLoggedIn(true);
     }
   }, []);
 
   const handleLogin = (user) => {
     localStorage.setItem("bayReadyUser", JSON.stringify(user));
+
+    const creatorEmail = localStorage.getItem("bayReadyCreatorEmail");
+    if (!creatorEmail && user?.email) {
+      localStorage.setItem("bayReadyCreatorEmail", user.email);
+    }
 
     // Save shop info to localStorage
     const shopData = {

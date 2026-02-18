@@ -28,7 +28,10 @@ export default function Checklists() {
     markChecklistComplete,
     addChecklistTask,
     deleteChecklistTask,
+    canDeleteContent,
   } = useAppContext();
+
+  const canDelete = canDeleteContent();
 
   const currentTasks = checklists[activeChecklist];
   const completedCount = currentTasks.filter((t) => t.completed).length;
@@ -415,16 +418,18 @@ export default function Checklists() {
                       </div>
                     </div>
                   )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteChecklistTask(activeChecklist, task.id);
-                    }}
-                    className="p-2 opacity-0 group-hover:opacity-100 hover:bg-red-50 rounded-lg transition-all"
-                    title="Delete task"
-                  >
-                    <Trash2 size={18} className="text-danger" />
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteChecklistTask(activeChecklist, task.id);
+                      }}
+                      className="p-2 opacity-0 group-hover:opacity-100 hover:bg-red-50 rounded-lg transition-all"
+                      title="Delete task"
+                    >
+                      <Trash2 size={18} className="text-danger" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

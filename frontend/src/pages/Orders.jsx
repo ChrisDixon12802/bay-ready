@@ -26,7 +26,10 @@ export default function Orders() {
     addOrder: contextAddOrder,
     toggleOrder: contextToggleOrder,
     deleteOrder,
+    canDeleteContent,
   } = useAppContext();
+
+  const canDelete = canDeleteContent();
 
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -524,15 +527,17 @@ export default function Orders() {
                           </div>
                         </div>
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteOrder(order.id);
-                          }}
-                          className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {canDelete && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteOrder(order.id);
+                            }}
+                            className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -601,15 +606,17 @@ export default function Orders() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteOrder(order.id);
-                    }}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                  >
-                    <Trash2 size={20} />
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteOrder(order.id);
+                      }}
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -656,15 +663,17 @@ export default function Orders() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteOrder(order.id);
-                    }}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteOrder(order.id);
+                      }}
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
