@@ -17,36 +17,17 @@ function AppContent() {
   const [voiceActive, setVoiceActive] = useState(false);
   const [autoStart, setAutoStart] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const { timeSavedToday, settings, setShopInfo } = useAppContext();
 
   useEffect(() => {
     const savedLogin = localStorage.getItem("bayReadyUser");
     if (savedLogin) {
-      setCurrentUser(JSON.parse(savedLogin));
       setIsLoggedIn(true);
     }
   }, []);
 
-  const creatorEmail = localStorage.getItem("bayReadyCreatorEmail");
-  const isCreator =
-    !!currentUser?.email &&
-    !!creatorEmail &&
-    currentUser.email.toLowerCase() === creatorEmail.toLowerCase();
-
-  useEffect(() => {
-    if (!isCreator && currentPage === "analytics") {
-      setCurrentPage("dashboard");
-    }
-  }, [isCreator, currentPage]);
-
   const handleLogin = (user) => {
     localStorage.setItem("bayReadyUser", JSON.stringify(user));
-
-    const existingCreator = localStorage.getItem("bayReadyCreatorEmail");
-    if (!existingCreator && user.email) {
-      localStorage.setItem("bayReadyCreatorEmail", user.email.toLowerCase());
-    }
 
     // Save shop info to localStorage
     const shopData = {
@@ -59,13 +40,11 @@ function AppContent() {
     };
     localStorage.setItem("bayReadyShopInfo", JSON.stringify(shopData));
     setShopInfo(shopData);
-    setCurrentUser(user);
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("bayReadyUser");
-    setCurrentUser(null);
     setIsLoggedIn(false);
     setVoiceActive(false);
   };
@@ -79,17 +58,7 @@ function AppContent() {
     checklists: <Checklists />,
     tasks: <Tasks />,
     orders: <Orders />,
-    analytics: isCreator ? (
-      <Analytics />
-    ) : (
-      <div className="card border-2 border-amber-200 bg-amber-50">
-        <h2 className="text-lg font-bold text-dark">Analytics Locked</h2>
-        <p className="text-sm text-gray-700 mt-2">
-          Analytics is reserved for the creator account to validate app
-          performance and data integrity.
-        </p>
-      </div>
-    ),
+    analytics: <Analytics />,
     settings: <Settings onLogout={handleLogout} />,
   };
 
@@ -140,8 +109,8 @@ function AppContent() {
             { id: "checklists", label: "Clean" },
             { id: "tasks", label: "Tasks" },
             { id: "orders", label: "Orders" },
+            { id: "analytics", label: "Analytics" },
             { id: "settings", label: "Settings" },
-            ...(isCreator ? [{ id: "analytics", label: "Analytics" }] : []),
           ].map(({ id, label }) => (
             <button
               key={id}
