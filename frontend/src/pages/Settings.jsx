@@ -42,9 +42,54 @@ export default function Settings({ onLogout }) {
   const [newRole, setNewRole] = useState({
     name: "",
     icon: "👤",
-    color: "bg-gray-100 text-gray-800",
-    border: "border-gray-300",
+    color: "bg-blue-100 text-blue-800",
+    border: "border-blue-300",
   });
+
+  // Predefined role color options
+  const colorOptions = [
+    {
+      name: "Blue",
+      color: "bg-blue-100 text-blue-800",
+      border: "border-blue-300",
+    },
+    {
+      name: "Purple",
+      color: "bg-purple-100 text-purple-800",
+      border: "border-purple-300",
+    },
+    {
+      name: "Pink",
+      color: "bg-pink-100 text-pink-800",
+      border: "border-pink-300",
+    },
+    { name: "Red", color: "bg-red-100 text-red-800", border: "border-red-300" },
+    {
+      name: "Orange",
+      color: "bg-orange-100 text-orange-800",
+      border: "border-orange-300",
+    },
+    {
+      name: "Yellow",
+      color: "bg-yellow-100 text-yellow-800",
+      border: "border-yellow-300",
+    },
+    {
+      name: "Green",
+      color: "bg-green-100 text-green-800",
+      border: "border-green-300",
+    },
+    {
+      name: "Teal",
+      color: "bg-teal-100 text-teal-800",
+      border: "border-teal-300",
+    },
+    {
+      name: "Gray",
+      color: "bg-gray-100 text-gray-800",
+      border: "border-gray-300",
+    },
+  ];
   const [localSettings, setLocalSettings] = useState(settings);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
@@ -500,13 +545,45 @@ export default function Settings({ onLogout }) {
                     maxLength="2"
                     className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                   />
-                  <button
-                    onClick={handleAddRole}
-                    className="btn-primary px-6 py-2 font-semibold text-sm"
-                  >
-                    Add
-                  </button>
                 </div>
+
+                {/* Color Selection */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-700 mb-2 block">
+                    Role Color
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {colorOptions.map((option) => (
+                      <button
+                        key={option.name}
+                        onClick={() =>
+                          setNewRole({
+                            ...newRole,
+                            color: option.color,
+                            border: option.border,
+                          })
+                        }
+                        className={`p-2 rounded-lg border-2 transition-all ${
+                          newRole.color === option.color
+                            ? `${option.color} ${option.border} border-2`
+                            : `${option.color} border-2 border-transparent opacity-60`
+                        }`}
+                        title={option.name}
+                      >
+                        <span className="text-sm font-semibold">
+                          {option.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAddRole}
+                  className="w-full btn-primary py-2 font-semibold text-sm"
+                >
+                  Create Role
+                </button>
               </div>
 
               {/* Roles List */}
