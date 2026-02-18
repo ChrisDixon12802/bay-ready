@@ -19,6 +19,7 @@ import {
   Building2,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
+import { convertTo12Hour } from "@/utils/timeFormat";
 
 export default function Settings({ onLogout }) {
   const {
@@ -791,26 +792,32 @@ export default function Settings({ onLogout }) {
                         <label className="text-xs text-gray-600 mb-1 block">
                           Open
                         </label>
+                        <div className="text-sm font-semibold text-gray-800 px-3 py-2 bg-blue-50 rounded border border-blue-200">
+                          {convertTo12Hour(weeklyHours[day].open)}
+                        </div>
                         <input
                           type="time"
                           value={weeklyHours[day].open}
                           onChange={(e) =>
                             handleDayHoursChange(day, "open", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded focus:border-orange-500 focus:outline-none text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 rounded focus:border-orange-500 focus:outline-none text-sm mt-2"
                         />
                       </div>
                       <div>
                         <label className="text-xs text-gray-600 mb-1 block">
                           Close
                         </label>
+                        <div className="text-sm font-semibold text-gray-800 px-3 py-2 bg-red-50 rounded border border-red-200">
+                          {convertTo12Hour(weeklyHours[day].close)}
+                        </div>
                         <input
                           type="time"
                           value={weeklyHours[day].close}
                           onChange={(e) =>
                             handleDayHoursChange(day, "close", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded focus:border-orange-500 focus:outline-none text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 rounded focus:border-orange-500 focus:outline-none text-sm mt-2"
                         />
                       </div>
                     </div>

@@ -14,6 +14,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
+import { convertTo12Hour } from "@/utils/timeFormat";
 
 export default function Tasks() {
   const {
@@ -453,7 +454,7 @@ export default function Tasks() {
                       {task.dueTime && (
                         <span className="text-xs bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-medium flex items-center gap-1">
                           <Clock size={12} />
-                          {task.dueTime}
+                          {convertTo12Hour(task.dueTime)}
                         </span>
                       )}
 
@@ -527,7 +528,7 @@ export default function Tasks() {
                         {task.dueTime && (
                           <span className="text-xs text-gray-400 flex items-center gap-1">
                             <Clock size={10} />
-                            {task.dueTime}
+                            {convertTo12Hour(task.dueTime)}
                           </span>
                         )}
                       </div>

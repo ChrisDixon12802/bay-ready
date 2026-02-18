@@ -14,6 +14,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
+import { convertTo12Hour } from "@/utils/timeFormat";
 
 export default function Dashboard() {
   const {
@@ -166,11 +167,11 @@ export default function Dashboard() {
               <div className="space-y-1">
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">Open:</span>{" "}
-                  {todaySchedule?.open || "--:--"}
+                  {convertTo12Hour(todaySchedule?.open) || "--:--"}
                 </p>
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">Close:</span>{" "}
-                  {todaySchedule?.close || "--:--"}
+                  {convertTo12Hour(todaySchedule?.close) || "--:--"}
                 </p>
               </div>
             ) : (
