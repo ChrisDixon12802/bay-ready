@@ -41,10 +41,7 @@ export default function Checklists() {
   const requiredTasks = currentTasks.filter((t) => t.required);
   const requiredCompleted = requiredTasks.filter((t) => t.completed).length;
   const allRequiredDone = requiredCompleted === requiredTasks.length;
-
-  // Calculate time estimate (2 min per task)
   const remainingTasks = currentTasks.filter((t) => !t.completed).length;
-  const estimatedTime = remainingTasks * 2;
 
   // Checklist config
   const checklistConfig = {
@@ -134,8 +131,8 @@ export default function Checklists() {
             <p className="text-xs opacity-75">Required</p>
           </div>
           <div>
-            <p className="text-2xl font-bold">{estimatedTime}m</p>
-            <p className="text-xs opacity-75">Time Left</p>
+            <p className="text-2xl font-bold">{remainingTasks}</p>
+            <p className="text-xs opacity-75">Remaining</p>
           </div>
         </div>
       </div>
@@ -253,9 +250,7 @@ export default function Checklists() {
           ) : (
             <div className="flex items-center gap-2 text-gray-600">
               <Clock size={20} className={config.textColor} />
-              <span className="text-sm">
-                {remainingTasks} tasks to go • ~{estimatedTime} minutes
-              </span>
+              <span className="text-sm">{remainingTasks} tasks to go</span>
             </div>
           )}
         </div>
@@ -398,10 +393,7 @@ export default function Checklists() {
                       </span>
                     )}
                     {!task.completed && (
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
-                        <Clock size={12} />
-                        ~2 min
-                      </span>
+                      <span className="text-xs text-gray-500">Pending</span>
                     )}
                     {task.completed && (
                       <span className="text-xs text-success font-medium">
