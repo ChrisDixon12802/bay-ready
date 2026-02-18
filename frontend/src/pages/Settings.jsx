@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   Edit2,
   Building2,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
 import { convertTo12Hour } from "@/utils/timeFormat";
@@ -422,140 +424,19 @@ export default function Settings({ onLogout }) {
         </div>
       </div>
 
-      {/* Role Management */}
+      {/* Team & Roles Management */}
       <div className="space-y-4">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-100 p-2 rounded-lg">
-              <Shield className="text-indigo-600" size={24} />
+            <div className="bg-purple-100 p-2 rounded-lg">
+              <Users className="text-purple-600" size={24} />
             </div>
             <div>
-              <h3 className="font-bold text-dark text-lg">Role Management</h3>
+              <h3 className="font-bold text-dark text-lg">Team & Roles</h3>
               <p className="text-xs text-gray-600">
-                {customRoles.length} roles available
-              </p>
-            </div>
-          </div>
-          {!showNewRole && (
-            <button
-              onClick={() => setShowNewRole(true)}
-              className="btn-primary px-4 py-2 flex items-center gap-2 text-sm"
-            >
-              <Plus size={16} />
-              Add Role
-            </button>
-          )}
-        </div>
-
-        {/* Add Role Form */}
-        {showNewRole && (
-          <div className="card space-y-4 border-2 border-indigo-300 shadow-xl bg-gradient-to-br from-white to-indigo-50">
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold text-dark">Create New Role</h4>
-              <button
-                onClick={() => setShowNewRole(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div>
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                Role Name *
-              </label>
-              <input
-                type="text"
-                placeholder="e.g., Senior Mechanic..."
-                value={newRole.name}
-                onChange={(e) =>
-                  setNewRole({ ...newRole, name: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none"
-                autoFocus
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
-                Icon Emoji
-              </label>
-              <input
-                type="text"
-                placeholder="e.g., 🔧, 👔, 🎯..."
-                value={newRole.icon}
-                onChange={(e) =>
-                  setNewRole({ ...newRole, icon: e.target.value })
-                }
-                maxLength="2"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none"
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleAddRole}
-                className="flex-1 btn-primary py-3 rounded-lg font-semibold"
-              >
-                Create Role
-              </button>
-              <button
-                onClick={() => setShowNewRole(false)}
-                className="flex-1 btn-secondary py-3 rounded-lg font-semibold"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Roles List */}
-        <div className="grid gap-3">
-          {customRoles.length === 0 ? (
-            <div className="card text-center py-6">
-              <p className="text-gray-500">No roles created yet</p>
-            </div>
-          ) : (
-            customRoles.map((role) => (
-              <div
-                key={role.name}
-                className={`card border-l-4 ${role.border} hover:shadow-lg transition-all flex items-center justify-between`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-12 h-12 rounded-full ${role.color} flex items-center justify-center text-2xl`}
-                  >
-                    {role.icon}
-                  </div>
-                  <div>
-                    <p className="font-bold text-dark">{role.name}</p>
-                    <p className="text-xs text-gray-500">Custom role</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => deleteRole(role.name)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                  title="Delete role"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Team Management */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <Users className="text-blue-600" size={24} />
-            </div>
-            <div>
-              <h3 className="font-bold text-dark text-lg">Team Management</h3>
-              <p className="text-xs text-gray-600">
-                {employees.length} active members
+                {employees.length} member{employees.length !== 1 ? "s" : ""},{" "}
+                {customRoles.length} role{customRoles.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
@@ -570,9 +451,91 @@ export default function Settings({ onLogout }) {
           )}
         </div>
 
+        {/* Roles Subsection (Collapsible) */}
+        <div className="card bg-gradient-to-br from-purple-50 to-white">
+          <div
+            className="flex items-center justify-between cursor-pointer p-1"
+            onClick={() => setShowNewRole(!showNewRole)}
+          >
+            <div className="flex items-center gap-2">
+              <Shield size={18} className="text-purple-600" />
+              <span className="font-semibold text-dark text-sm">
+                Custom Roles
+              </span>
+              <span className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full font-semibold">
+                {customRoles.length}
+              </span>
+            </div>
+            <button className="p-1 hover:bg-purple-100 rounded-lg transition-all">
+              {showNewRole ? (
+                <ChevronUp size={18} className="text-purple-600" />
+              ) : (
+                <ChevronDown size={18} className="text-purple-600" />
+              )}
+            </button>
+          </div>
+
+          {showNewRole && (
+            <div className="border-t border-purple-200 mt-3 pt-4 space-y-4">
+              {/* Create Role Form */}
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Role name (e.g., Senior Mechanic)..."
+                  value={newRole.name}
+                  onChange={(e) =>
+                    setNewRole({ ...newRole, name: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Icon (e.g., 🔧)..."
+                    value={newRole.icon}
+                    onChange={(e) =>
+                      setNewRole({ ...newRole, icon: e.target.value })
+                    }
+                    maxLength="2"
+                    className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
+                  />
+                  <button
+                    onClick={handleAddRole}
+                    className="btn-primary px-6 py-2 font-semibold text-sm"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Roles List */}
+              {customRoles.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {customRoles.map((role) => (
+                    <div
+                      key={role.name}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg ${role.color} border-l-2 ${role.border}`}
+                    >
+                      <span className="text-lg">{role.icon}</span>
+                      <span className="font-semibold text-sm">{role.name}</span>
+                      <button
+                        onClick={() => deleteRole(role.name)}
+                        className="ml-1 text-gray-400 hover:text-red-600 transition-all"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Add Employee Form */}
         {showNewEmployee && (
-          <div className="card space-y-4 border-2 border-blue-300 shadow-xl bg-gradient-to-br from-white to-blue-50">
+          <div className="card space-y-4 border-2 border-purple-300 shadow-xl bg-gradient-to-br from-white to-purple-50">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-dark">Add Team Member</h4>
               <button
@@ -597,7 +560,7 @@ export default function Settings({ onLogout }) {
                 onChange={(e) =>
                   setNewEmployee({ ...newEmployee, name: e.target.value })
                 }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"
                 autoFocus
               />
             </div>
@@ -611,7 +574,7 @@ export default function Settings({ onLogout }) {
                 onChange={(e) =>
                   setNewEmployee({ ...newEmployee, role: e.target.value })
                 }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"
               >
                 <option value="">Select a role...</option>
                 {customRoles.map((role) => (
@@ -643,16 +606,16 @@ export default function Settings({ onLogout }) {
           </div>
         )}
 
-        {/* Employee List */}
+        {/* Team Members List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {employees.length === 0 ? (
-            <div className="col-span-2 card text-center py-12 bg-gray-50 border-2 border-dashed border-gray-300">
-              <Users className="text-gray-400 mx-auto mb-3" size={48} />
+            <div className="col-span-2 card text-center py-12 bg-gradient-to-br from-gray-50 to-purple-50 border-2 border-dashed border-purple-300">
+              <Users className="text-purple-300 mx-auto mb-3" size={48} />
               <p className="text-lg font-semibold text-gray-600 mb-1">
-                No Team Members
+                No Team Members Yet
               </p>
               <p className="text-sm text-gray-500">
-                Add your first employee to get started
+                Create a role above, then add your first employee
               </p>
             </div>
           ) : (
