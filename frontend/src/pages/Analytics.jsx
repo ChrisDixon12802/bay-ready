@@ -614,23 +614,20 @@ export default function Analytics() {
             )}
           </div>
 
-          {/* Incomplete Checklist Items */}
-          {(checklists.opening.filter((item) => !item.completed).length > 0 ||
+          {/* Incomplete Daily Flow Items */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="text-yellow-600" size={20} />
+              <h4 className="font-semibold text-dark text-sm">Daily Flow</h4>
+              <span className="bg-yellow-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                {checklists.opening.filter((item) => !item.completed).length +
+                  checklists.mid.filter((item) => !item.completed).length +
+                  checklists.closing.filter((item) => !item.completed).length}
+              </span>
+            </div>
+            {checklists.opening.filter((item) => !item.completed).length > 0 ||
             checklists.mid.filter((item) => !item.completed).length > 0 ||
-            checklists.closing.filter((item) => !item.completed).length >
-              0) && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="text-yellow-600" size={20} />
-                <h4 className="font-semibold text-dark text-sm">
-                  Daily Checklist
-                </h4>
-                <span className="bg-yellow-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
-                  {checklists.opening.filter((item) => !item.completed).length +
-                    checklists.mid.filter((item) => !item.completed).length +
-                    checklists.closing.filter((item) => !item.completed).length}
-                </span>
-              </div>
+            checklists.closing.filter((item) => !item.completed).length > 0 ? (
               <div className="space-y-2 ml-6 bg-white p-3 rounded-lg">
                 {checklists.opening.filter((item) => !item.completed).length >
                   0 && (
@@ -690,8 +687,12 @@ export default function Analytics() {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-xs text-gray-600 ml-6 italic">
+                All daily flow items completed!
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
