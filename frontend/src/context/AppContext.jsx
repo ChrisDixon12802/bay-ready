@@ -98,17 +98,23 @@ export function AppProvider({ children }) {
     }
   };
 
-  const verifyDeleteApproval = (password) => {
+  const hasDeletePin = () => {
+    const savedPin = localStorage.getItem("bayReadyDeletePin");
+    return typeof savedPin === "string" && savedPin.length > 0;
+  };
+
+  const setDeletePin = (pin) => {
+    localStorage.setItem("bayReadyDeletePin", pin);
+  };
+
+  const verifyDeletePin = (pin) => {
     try {
       if (!canDeleteContent()) {
         return false;
       }
 
-      const savedUser = localStorage.getItem("bayReadyUser");
-      const currentUser = savedUser ? JSON.parse(savedUser) : null;
-      const currentPassword = currentUser?.password || "";
-
-      return currentPassword.length > 0 && currentPassword === password;
+      const savedPin = localStorage.getItem("bayReadyDeletePin") || "";
+      return savedPin.length > 0 && savedPin === pin;
     } catch {
       return false;
     }
@@ -423,7 +429,9 @@ export function AppProvider({ children }) {
     addOrder,
     deleteOrder,
     canDeleteContent,
-    verifyDeleteApproval,
+    hasDeletePin,
+    setDeletePin,
+    verifyDeletePin,
     timeSavedToday,
     setTimeSavedToday,
     resetTimeSaved,

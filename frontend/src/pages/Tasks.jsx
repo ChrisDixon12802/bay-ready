@@ -25,7 +25,9 @@ export default function Tasks() {
     toggleTask: contextToggleTask,
     deleteTask,
     canDeleteContent,
-    verifyDeleteApproval,
+    hasDeletePin,
+    setDeletePin,
+    verifyDeletePin,
   } = useAppContext();
 
   const canDelete = canDeleteContent();
@@ -36,7 +38,7 @@ export default function Tasks() {
   const [filterAssignee, setFilterAssignee] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [taskPendingDelete, setTaskPendingDelete] = useState(null);
-  const [deletePassword, setDeletePassword] = useState("");
+  const [deletePin, setDeletePinValue] = useState("");
   const [deleteError, setDeleteError] = useState("");
 
   const [newTask, setNewTask] = useState({
@@ -567,25 +569,36 @@ export default function Tasks() {
       <ConfirmModal
         isOpen={taskPendingDelete !== null}
         title="Delete Task"
-        message={`Are you sure you want to delete "${taskPendingDelete?.name || "this task"}"? This action cannot be undone.`}
+        message={
+          hasDeletePin()
+            ? `Are you sure you want to delete "${taskPendingDelete?.name || "this task"}"? This action cannot be undone.`
+            : `Set a 4-digit delete PIN, then delete "${taskPendingDelete?.name || "this task"}".`
+        }
         confirmText="Delete Task"
-        requirePassword
-        passwordValue={deletePassword}
-        onPasswordChange={(value) => {
-          setDeletePassword(value);
+        requirePin
+        pinValue={deletePin}
+        onPinChange={(value) => {
+          setDeletePinValue(value.replace(/\D/g, "").slice(0, 4));
           if (deleteError) {
             setDeleteError("");
           }
         }}
-        passwordError={deleteError}
+        pinError={deleteError}
         onCancel={() => {
           setTaskPendingDelete(null);
-          setDeletePassword("");
+          setDeletePinValue("");
           setDeleteError("");
         }}
         onConfirm={() => {
-          if (!verifyDeleteApproval(deletePassword)) {
-            setDeleteError("Manager/Creator password is incorrect.");
+          if (!/^\d{4}$/.test(deletePin)) {
+            setDeleteError("Enter a valid 4-digit PIN.");
+            return;
+          }
+
+          if (!hasDeletePin()) {
+            setDeletePin(deletePin);
+          } else if (!verifyDeletePin(deletePin)) {
+            setDeleteError("Delete PIN is incorrect.");
             return;
           }
 
@@ -593,7 +606,7 @@ export default function Tasks() {
             deleteTask(taskPendingDelete.id);
           }
           setTaskPendingDelete(null);
-          setDeletePassword("");
+          setDeletePinValue("");
           setDeleteError("");
         }}
       />
