@@ -19,6 +19,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function Orders() {
   const {
@@ -37,6 +38,7 @@ export default function Orders() {
   const [filterVendor, setFilterVendor] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [groupByVendor, setGroupByVendor] = useState(false);
+  const [orderPendingDelete, setOrderPendingDelete] = useState(null);
 
   const [newOrder, setNewOrder] = useState({
     item: "",
@@ -531,7 +533,7 @@ export default function Orders() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              deleteOrder(order.id);
+                              setOrderPendingDelete(order.id);
                             }}
                             className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                           >
@@ -610,7 +612,7 @@ export default function Orders() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteOrder(order.id);
+                        setOrderPendingDelete(order.id);
                       }}
                       className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     >
@@ -667,7 +669,7 @@ export default function Orders() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteOrder(order.id);
+                        setOrderPendingDelete(order.id);
                       }}
                       className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     >
@@ -680,6 +682,20 @@ export default function Orders() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={orderPendingDelete !== null}
+        title="Delete Order"
+        message="Are you sure you want to delete this order? This action cannot be undone."
+        confirmText="Delete Order"
+        onCancel={() => setOrderPendingDelete(null)}
+        onConfirm={() => {
+          if (orderPendingDelete !== null) {
+            deleteOrder(orderPendingDelete);
+          }
+          setOrderPendingDelete(null);
+        }}
+      />
     </div>
   );
 }

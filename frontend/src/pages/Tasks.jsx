@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
 import { convertTo12Hour } from "@/utils/timeFormat";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function Tasks() {
   const {
@@ -33,6 +34,7 @@ export default function Tasks() {
   const [filterPriority, setFilterPriority] = useState("all");
   const [filterAssignee, setFilterAssignee] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [taskPendingDelete, setTaskPendingDelete] = useState(null);
 
   const [newTask, setNewTask] = useState({
     title: "",
@@ -473,7 +475,7 @@ export default function Tasks() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteTask(task.id);
+                        setTaskPendingDelete(task.id);
                       }}
                       className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                     >
@@ -545,7 +547,7 @@ export default function Tasks() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteTask(task.id);
+                        setTaskPendingDelete(task.id);
                       }}
                       className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                     >
@@ -558,6 +560,20 @@ export default function Tasks() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={taskPendingDelete !== null}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete Task"
+        onCancel={() => setTaskPendingDelete(null)}
+        onConfirm={() => {
+          if (taskPendingDelete !== null) {
+            deleteTask(taskPendingDelete);
+          }
+          setTaskPendingDelete(null);
+        }}
+      />
     </div>
   );
 }

@@ -16,12 +16,14 @@ import {
   X,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function Checklists() {
   const [activeChecklist, setActiveChecklist] = useState("opening");
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskRequired, setNewTaskRequired] = useState(false);
+  const [dailyFlowPendingDelete, setDailyFlowPendingDelete] = useState(null);
   const {
     checklists,
     toggleChecklistTask,
@@ -422,7 +424,7 @@ export default function Checklists() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteChecklistTask(activeChecklist, task.id);
+                        setDailyFlowPendingDelete(task.id);
                       }}
                       className="p-2 opacity-0 group-hover:opacity-100 hover:bg-red-50 rounded-lg transition-all"
                       title="Delete task"
@@ -513,6 +515,20 @@ export default function Checklists() {
           <p className="text-xs text-purple-700 font-medium">Min Saved</p>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={dailyFlowPendingDelete !== null}
+        title="Delete Daily Flow Item"
+        message="Are you sure you want to delete this item from Daily Flow? This action cannot be undone."
+        confirmText="Delete Item"
+        onCancel={() => setDailyFlowPendingDelete(null)}
+        onConfirm={() => {
+          if (dailyFlowPendingDelete !== null) {
+            deleteChecklistTask(activeChecklist, dailyFlowPendingDelete);
+          }
+          setDailyFlowPendingDelete(null);
+        }}
+      />
     </div>
   );
 }
