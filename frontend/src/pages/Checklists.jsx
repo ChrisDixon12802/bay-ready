@@ -424,7 +424,10 @@ export default function Checklists() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setDailyFlowPendingDelete(task.id);
+                        setDailyFlowPendingDelete({
+                          id: task.id,
+                          name: task.task,
+                        });
                       }}
                       className="p-2 opacity-0 group-hover:opacity-100 hover:bg-red-50 rounded-lg transition-all"
                       title="Delete task"
@@ -519,12 +522,12 @@ export default function Checklists() {
       <ConfirmModal
         isOpen={dailyFlowPendingDelete !== null}
         title="Delete Daily Flow Item"
-        message="Are you sure you want to delete this item from Daily Flow? This action cannot be undone."
+        message={`Are you sure you want to delete "${dailyFlowPendingDelete?.name || "this item"}" from Daily Flow? This action cannot be undone.`}
         confirmText="Delete Item"
         onCancel={() => setDailyFlowPendingDelete(null)}
         onConfirm={() => {
           if (dailyFlowPendingDelete !== null) {
-            deleteChecklistTask(activeChecklist, dailyFlowPendingDelete);
+            deleteChecklistTask(activeChecklist, dailyFlowPendingDelete.id);
           }
           setDailyFlowPendingDelete(null);
         }}

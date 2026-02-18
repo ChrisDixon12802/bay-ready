@@ -533,7 +533,10 @@ export default function Orders() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setOrderPendingDelete(order.id);
+                              setOrderPendingDelete({
+                                id: order.id,
+                                name: order.item,
+                              });
                             }}
                             className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                           >
@@ -612,7 +615,10 @@ export default function Orders() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOrderPendingDelete(order.id);
+                        setOrderPendingDelete({
+                          id: order.id,
+                          name: order.item,
+                        });
                       }}
                       className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     >
@@ -669,7 +675,10 @@ export default function Orders() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOrderPendingDelete(order.id);
+                        setOrderPendingDelete({
+                          id: order.id,
+                          name: order.item,
+                        });
                       }}
                       className="flex-shrink-0 p-2 text-gray-400 hover:text-danger hover:bg-red-50 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     >
@@ -686,12 +695,12 @@ export default function Orders() {
       <ConfirmModal
         isOpen={orderPendingDelete !== null}
         title="Delete Order"
-        message="Are you sure you want to delete this order? This action cannot be undone."
+        message={`Are you sure you want to delete "${orderPendingDelete?.name || "this order"}"? This action cannot be undone.`}
         confirmText="Delete Order"
         onCancel={() => setOrderPendingDelete(null)}
         onConfirm={() => {
           if (orderPendingDelete !== null) {
-            deleteOrder(orderPendingDelete);
+            deleteOrder(orderPendingDelete.id);
           }
           setOrderPendingDelete(null);
         }}
