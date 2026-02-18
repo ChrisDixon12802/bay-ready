@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock,
   Trash2,
+  Lock,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
 
@@ -18,6 +19,34 @@ export default function Analytics() {
   const [daysTracked, setDaysTracked] = useState(0);
   const [bestDay, setBestDay] = useState(null);
   const [selectedRange, setSelectedRange] = useState("30d");
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isSetupMode, setIsSetupMode] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const ANALYTICS_PASSWORD_HASH_KEY = "bayReadyAnalyticsPasswordHash";
+  const ANALYTICS_UNLOCKED_KEY = "bayReadyAnalyticsUnlocked";
+
+  const hashPassword = async (value) => {
+    if (!window.crypto?.subtle) {
+      return btoa(value);
+    }
+
+    const data = new TextEncoder().encode(value);
+    const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  };
+
+  useEffect(() => {
+    const savedHash = localStorage.getItem(ANALYTICS_PASSWORD_HASH_KEY);
+    const unlockedThisSession = sessionStorage.getItem(ANALYTICS_UNLOCKED_KEY);
+
+    setIsSetupMode(!savedHash);
+    setIsUnlocked(unlockedThisSession === "true");
+  }, []);
 
   useEffect(() => {
     // Load all historical data from localStorage
@@ -184,6 +213,128 @@ export default function Analytics() {
       resetTimeSaved();
     }
   };
+
+  const handleSetAnalyticsPassword = async (e) => {
+    e.preventDefault();
+    setPasswordError("");
+
+    if (!password || !confirmPassword) {
+      setPasswordError("Enter and confirm your analytics password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
+    const hashed = await hashPassword(password);
+    localStorage.setItem(ANALYTICS_PASSWORD_HASH_KEY, hashed);
+    sessionStorage.setItem(ANALYTICS_UNLOCKED_KEY, "true");
+    setIsSetupMode(false);
+    setIsUnlocked(true);
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleUnlockAnalytics = async (e) => {
+    e.preventDefault();
+    setPasswordError("");
+
+    if (!password) {
+      setPasswordError("Enter your analytics password.");
+      return;
+    }
+
+    const savedHash = localStorage.getItem(ANALYTICS_PASSWORD_HASH_KEY);
+    const enteredHash = await hashPassword(password);
+
+    if (!savedHash || enteredHash !== savedHash) {
+      setPasswordError("Incorrect password.");
+      return;
+    }
+
+    sessionStorage.setItem(ANALYTICS_UNLOCKED_KEY, "true");
+    setIsUnlocked(true);
+    setPassword("");
+  };
+
+  if (!isUnlocked || isSetupMode) {
+    return (
+      <div className="space-y-6 pb-24">
+        <div className="card border-2 border-indigo-200 shadow-lg max-w-lg mx-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-indigo-100 p-3 rounded-lg">
+              <Lock className="text-indigo-600" size={24} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-dark">
+                {isSetupMode ? "Set Analytics Password" : "Unlock Analytics"}
+              </h1>
+              <p className="text-sm text-gray-600">
+                Creator-only access for app diagnostics.
+              </p>
+            </div>
+          </div>
+
+          <form
+            onSubmit={
+              isSetupMode ? handleSetAnalyticsPassword : handleUnlockAnalytics
+            }
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
+                placeholder={
+                  isSetupMode ? "Create analytics password" : "Enter password"
+                }
+              />
+            </div>
+
+            {isSetupMode && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
+                  placeholder="Confirm analytics password"
+                />
+              </div>
+            )}
+
+            {passwordError && (
+              <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                {passwordError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+            >
+              {isSetupMode ? "Save Password" : "Unlock Analytics"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-24">
