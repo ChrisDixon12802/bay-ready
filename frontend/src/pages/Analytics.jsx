@@ -614,7 +614,7 @@ export default function Analytics() {
             )}
           </div>
 
-          {/* Incomplete Daily Flow Items */}
+          {/* Daily Flow Items */}
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Zap className="text-yellow-600" size={20} />
