@@ -419,22 +419,6 @@ export default function Orders() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-gray-700 mb-1 block">
-              Item to Order *
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., 5W-30 Motor Oil, Air Filters..."
-              value={newOrder.item}
-              onChange={(e) =>
-                setNewOrder({ ...newOrder, item: e.target.value })
-              }
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
-              autoFocus
-            />
-          </div>
-
-          <div>
             <label className="text-sm font-semibold text-gray-700 mb-1 block flex items-center gap-2">
               <Building2 size={16} />
               Vendor Name *
@@ -445,6 +429,22 @@ export default function Orders() {
               value={newOrder.vendor}
               onChange={(e) =>
                 setNewOrder({ ...newOrder, vendor: e.target.value })
+              }
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              Item to Order *
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., 5W-30 Motor Oil, Air Filters..."
+              value={newOrder.item}
+              onChange={(e) =>
+                setNewOrder({ ...newOrder, item: e.target.value })
               }
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
             />
