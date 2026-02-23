@@ -3,7 +3,6 @@ import {
   CheckCircle2,
   Circle,
   Plus,
-  AlertCircle,
   Package,
   Calendar,
   Truck,
@@ -16,7 +15,6 @@ import {
   Building2,
   Zap,
   ShoppingCart,
-  AlertTriangle,
 } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -39,6 +37,7 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterFrequency, setFilterFrequency] = useState("all");
   const [filterVendor, setFilterVendor] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [groupByVendor, setGroupByVendor] = useState(false);
   const [orderPendingDelete, setOrderPendingDelete] = useState(null);
@@ -50,7 +49,6 @@ export default function Orders() {
     vendor: "",
     frequency: "Weekly",
     dueDate: "",
-    emergency: false,
   });
 
   const handleAddOrder = () => {
@@ -61,7 +59,6 @@ export default function Orders() {
         vendor: "",
         frequency: "Weekly",
         dueDate: "",
-        emergency: false,
       });
       setShowNewOrder(false);
     }
@@ -69,6 +66,32 @@ export default function Orders() {
 
   // Get unique vendors
   const vendors = [...new Set(orders.map((o) => o.vendor))].sort();
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const getDueStatus = (order) => {
+    if (!order.dueDate) {
+      return "no-date";
+    }
+
+    const dueDate = new Date(`${order.dueDate}T00:00:00`);
+    if (dueDate.getTime() < startOfToday.getTime()) {
+      return "overdue";
+    }
+    if (dueDate.getTime() === startOfToday.getTime()) {
+      return "today";
+    }
+    return "upcoming";
+  };
+
+  const getDuePriority = (order) => {
+    const status = getDueStatus(order);
+    if (status === "overdue") return 0;
+    if (status === "today") return 1;
+    if (status === "upcoming") return 2;
+    return 3;
+  };
 
   // Filter orders
   const filterOrders = (orderList) => {
@@ -80,16 +103,25 @@ export default function Orders() {
         filterFrequency === "all" || order.frequency === filterFrequency;
       const matchesVendor =
         filterVendor === "all" || order.vendor === filterVendor;
-      return matchesSearch && matchesFrequency && matchesVendor;
+      const dueStatus = getDueStatus(order);
+      const matchesStatus =
+        filterStatus === "all" ||
+        (filterStatus === "overdue" && dueStatus === "overdue") ||
+        (filterStatus === "today" && dueStatus === "today") ||
+        (filterStatus === "no-date" && dueStatus === "no-date");
+      return (
+        matchesSearch && matchesFrequency && matchesVendor && matchesStatus
+      );
     });
   };
 
   const pendingOrders = filterOrders(orders.filter((o) => !o.completed));
   const completedOrders = filterOrders(orders.filter((o) => o.completed));
 
-  // Sort: emergency first, then by due date
+  // Sort by due priority, then due date
   const sortedPendingOrders = [...pendingOrders].sort((a, b) => {
-    if (a.emergency !== b.emergency) return b.emergency ? 1 : -1;
+    const duePriorityDiff = getDuePriority(a) - getDuePriority(b);
+    if (duePriorityDiff !== 0) return duePriorityDiff;
     if (a.dueDate && b.dueDate)
       return new Date(a.dueDate) - new Date(b.dueDate);
     return 0;
@@ -106,9 +138,16 @@ export default function Orders() {
     });
   }
 
-  const emergencyCount = pendingOrders.filter((o) => o.emergency).length;
+  const dueTodayCount = pendingOrders.filter(
+    (o) => getDueStatus(o) === "today",
+  ).length;
+  const overdueCount = pendingOrders.filter(
+    (o) => getDueStatus(o) === "overdue",
+  ).length;
   const activeFiltersCount =
-    (filterFrequency !== "all" ? 1 : 0) + (filterVendor !== "all" ? 1 : 0);
+    (filterFrequency !== "all" ? 1 : 0) +
+    (filterVendor !== "all" ? 1 : 0) +
+    (filterStatus !== "all" ? 1 : 0);
 
   const frequencyConfig = {
     "One-time": { color: "bg-gray-100 text-gray-700", icon: "⚪" },
@@ -141,10 +180,14 @@ export default function Orders() {
         </div>
 
         {/* Mini Stats */}
-        <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white border-opacity-30">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white border-opacity-30">
           <div>
-            <p className="text-2xl font-bold">{emergencyCount}</p>
-            <p className="text-xs opacity-75">Emergency</p>
+            <p className="text-2xl font-bold">{dueTodayCount}</p>
+            <p className="text-xs opacity-75">Due Today</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold">{overdueCount}</p>
+            <p className="text-xs opacity-75">Overdue</p>
           </div>
           <div>
             <p className="text-2xl font-bold">{completedOrders.length}</p>
@@ -289,11 +332,60 @@ export default function Orders() {
               </select>
             </div>
 
+            <div>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                Status
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setFilterStatus("all")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    filterStatus === "all"
+                      ? "bg-primary text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilterStatus("overdue")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    filterStatus === "overdue"
+                      ? "bg-danger text-white"
+                      : "bg-red-100 text-red-700 hover:bg-red-200"
+                  }`}
+                >
+                  Overdue
+                </button>
+                <button
+                  onClick={() => setFilterStatus("today")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    filterStatus === "today"
+                      ? "bg-blue-600 text-white"
+                      : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                  }`}
+                >
+                  Due Today
+                </button>
+                <button
+                  onClick={() => setFilterStatus("no-date")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    filterStatus === "no-date"
+                      ? "bg-gray-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  No Due Date
+                </button>
+              </div>
+            </div>
+
             {activeFiltersCount > 0 && (
               <button
                 onClick={() => {
                   setFilterFrequency("all");
                   setFilterVendor("all");
+                  setFilterStatus("all");
                 }}
                 className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 font-medium"
               >
@@ -393,28 +485,6 @@ export default function Orders() {
             </div>
           </div>
 
-          <label className="flex items-center gap-3 p-3 bg-red-50 border-2 border-red-200 rounded-lg cursor-pointer hover:bg-red-100 transition-all">
-            <input
-              type="checkbox"
-              checked={newOrder.emergency}
-              onChange={(e) =>
-                setNewOrder({ ...newOrder, emergency: e.target.checked })
-              }
-              className="w-5 h-5"
-            />
-            <div className="flex items-center gap-2 flex-1">
-              <AlertTriangle size={20} className="text-danger" />
-              <div>
-                <span className="font-semibold text-danger block">
-                  Emergency Order
-                </span>
-                <span className="text-xs text-red-700">
-                  Needs immediate attention
-                </span>
-              </div>
-            </div>
-          </label>
-
           <div className="flex gap-3 pt-2">
             <button
               onClick={handleAddOrder}
@@ -431,7 +501,6 @@ export default function Orders() {
                   vendor: "",
                   frequency: "Weekly",
                   dueDate: "",
-                  emergency: false,
                 });
               }}
               className="flex-1 bg-gray-200 text-dark py-3 rounded-lg hover:bg-gray-300 font-semibold"
@@ -483,20 +552,13 @@ export default function Orders() {
                       </p>
                     </div>
                   </div>
-                  {vendorOrders.some((o) => o.emergency) && (
-                    <AlertCircle className="text-danger" size={24} />
-                  )}
                 </div>
 
                 <div className="space-y-2">
                   {vendorOrders.map((order) => (
                     <div
                       key={order.id}
-                      className={`p-3 rounded-lg border transition-all group hover:shadow-md ${
-                        order.emergency
-                          ? "bg-red-50 border-red-300"
-                          : "bg-gray-50 border-gray-200"
-                      }`}
+                      className="p-3 rounded-lg border transition-all group hover:shadow-md bg-gray-50 border-gray-200"
                     >
                       <div className="flex items-start gap-3">
                         <button
@@ -523,12 +585,6 @@ export default function Orders() {
                               <span className="text-xs text-gray-600 flex items-center gap-1">
                                 <Calendar size={12} />
                                 {new Date(order.dueDate).toLocaleDateString()}
-                              </span>
-                            )}
-                            {order.emergency && (
-                              <span className="text-xs bg-danger text-white px-2 py-1 rounded-full font-semibold flex items-center gap-1">
-                                <AlertTriangle size={12} />
-                                URGENT
                               </span>
                             )}
                           </div>
@@ -561,11 +617,7 @@ export default function Orders() {
             {sortedPendingOrders.map((order) => (
               <div
                 key={order.id}
-                className={`card border-l-4 transition-all group hover:shadow-lg ${
-                  order.emergency
-                    ? "border-danger bg-red-50"
-                    : "border-orange-500"
-                }`}
+                className="card border-l-4 border-orange-500 transition-all group hover:shadow-lg"
               >
                 <div className="flex items-start gap-3">
                   <button
@@ -590,11 +642,6 @@ export default function Orders() {
                           </p>
                         </div>
                       </div>
-                      {order.emergency && (
-                        <div className="bg-danger text-white p-2 rounded-lg">
-                          <AlertCircle size={20} />
-                        </div>
-                      )}
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
@@ -608,6 +655,21 @@ export default function Orders() {
                         <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium flex items-center gap-1">
                           <Calendar size={12} />
                           Due {new Date(order.dueDate).toLocaleDateString()}
+                        </span>
+                      )}
+                      {getDueStatus(order) === "overdue" && (
+                        <span className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold">
+                          Overdue
+                        </span>
+                      )}
+                      {getDueStatus(order) === "today" && (
+                        <span className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">
+                          Due Today
+                        </span>
+                      )}
+                      {getDueStatus(order) === "no-date" && (
+                        <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-semibold">
+                          No Due Date
                         </span>
                       )}
                       <span className="text-xs text-gray-500 flex items-center gap-1">

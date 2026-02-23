@@ -37,6 +37,13 @@ export function AppProvider({ children }) {
     };
   });
 
+  const normalizeOrders = (ordersList = []) => {
+    return ordersList.map((order) => {
+      const { emergency, ...cleanOrder } = order;
+      return cleanOrder;
+    });
+  };
+
   const [timeSavedToday, setTimeSavedToday] = useState(() => {
     const saved = localStorage.getItem("bayReadyData");
     if (saved) {
@@ -184,7 +191,7 @@ export function AppProvider({ children }) {
     const saved = localStorage.getItem("bayReadyData");
     if (saved) {
       const data = JSON.parse(saved);
-      return data.orders || [];
+      return normalizeOrders(data.orders || []);
     }
     return [];
   });
@@ -385,7 +392,6 @@ export function AppProvider({ children }) {
       frequency: newOrder.frequency || "Weekly",
       dueDate: newOrder.dueDate || "TBD",
       completed: false,
-      emergency: newOrder.emergency || false,
     };
     setOrders((prev) => [...prev, order]);
   };
