@@ -1,5 +1,5 @@
-const CACHE_NAME = "bay-ready-v1";
-const RUNTIME_CACHE = "bay-ready-runtime";
+const CACHE_NAME = "bay-ready-v2";
+const RUNTIME_CACHE = "bay-ready-runtime-v2";
 const ASSETS_TO_CACHE = ["/", "/index.html", "/manifest.json"];
 
 // Install event - cache essential files
